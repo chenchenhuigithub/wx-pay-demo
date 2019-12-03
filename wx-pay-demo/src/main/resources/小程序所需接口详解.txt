@@ -1,0 +1,90 @@
+//这里后台的端口为8080,根据自己情况而定
+//小程序前端
+
+// 登录
+wx.login({
+  success: res => {
+	let code = res.code;
+	wx.getUserInfo({
+	  success: res => {
+		wx.request({
+		  url: 'http://自己的IP:8080/user/login/'+code,
+		  method: 'GET',
+		  success: res => {
+			console.info(res.data.data)
+			wx.setStorageSync("openid", res.data.data);
+		  }
+		})
+	  }
+	})
+  }
+})
+
+
+//添加订单
+push(){
+	let _this = this
+	wx.request({
+	  url: 'http://自己的IP:8080/order',
+	  method: 'POST',
+	  data: wx.getStorageSync("openid"),
+	  success: (res) => {
+
+	  },
+	})
+},
+
+//支付
+pay(event){
+	//参数为要支付的订单对象
+	let order = event.currentTarget.dataset.data;
+
+	wx.request({
+        url: 'http://自己的IP:8080/order/pay?openid=' + wx.getStorageSync("openid") + '&orderId=' + order.orderId,
+        method: 'GET',
+        success: (res) => {
+          let data = res.data.data
+          wx.requestPayment({
+			timeStamp: data.timeStamp,
+			nonceStr: data.nonceStr,
+			package: data.packageValue,
+			signType: data.signType,
+			paySign: data.paySign,
+
+			//小程序前端回调success表示支付成功 - 这并不能代表真正的成功, 支付是否成功最终由后端确认, 所以回调函数再向确认是否支付成功或显示订单详情
+            success: (res) => {
+			  wx.showToast({
+                title: '支付成功',
+                icon: 'none'
+              })
+              console.info(res);
+            },
+			//取消支付或支付失败
+            fail: (res) => {
+
+              wx.showToast({
+                title: '取消支付',
+                icon: 'none'
+              })
+              console.info(res)
+            },
+
+          })
+        },
+      })
+}
+
+//退款
+refund(event){
+
+	//参数为要支付的订单对象
+	let order = event.currentTarget.dataset.data;
+
+	wx.request({
+        url: 'http://自己的IP:8080/order/refund?orderId=' + order.orderId,
+        method: 'GET',
+        success: (res) => {
+
+        }
+      })
+}

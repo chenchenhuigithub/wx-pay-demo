@@ -1,6 +1,6 @@
 server:
   port: 8080
-#自行配置了大兄弟
+#数据库就自行配置了大兄弟
 spring:
   datasource:
     url:
@@ -14,8 +14,8 @@ mybatis:
 
 wx:
   miniapp:
-    appid:
-    secret:
+    appid: #小程序id
+    secret: #AppSecret
     aesKey: #微信小程序消息服务器配置的EncodingAESKey
     msgDataFormat: JSON
     mchId: #微信支付商户号
