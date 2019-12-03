@@ -1,1 +1,1 @@
-# wx-pay-demo
+# 微信支付的demo
